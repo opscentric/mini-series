@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:12-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+    volumes:
+      - database-data:/var/lib/postgresql/data
+  
+  node:
+    build: .
+    environment:
+      - PORT=4000
+      - PGHOST=database
+      - PGDATABASE=postgres
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+    expose:
+      - 4000
+    ports:
+      - 80:4000
+    links:
+      - database
+    depends_on:
+      - database
+
+volumes:
+  database-data:

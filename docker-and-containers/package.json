@@ -1,0 +1,16 @@
+{
+  "name": "opscentric-node-postgres",
+  "version": "1.0.0",
+  "description": "OpsCentric Node and Postgres Docker Compose Tutorial",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Caleb Fornari",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.0.3"
+  }
+}
