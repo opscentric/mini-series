@@ -99,68 +99,34 @@ Docker Compose is a configuration format for specifying how Docker containers ar
 
 To use Docker Compose you normally create a file called docker-compose.yml in the same folder as your Dockerfile(s). This files defines which services you want to run and how they can communicate.
 
-Our defines 2 services, the Node app in this repo and a Postgres database. Have a look at it below:
+Our docker-compose.yml file defines 2 services, the Node app in this repo and a Postgres database. Have a look at it below with comments explaining each line:
 
 ```
-version: '3'
-services:
-  database:
-    image: postgres:12-alpine
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: 'postgres'
-    volumes:
-      - database-data:/var/lib/postgresql/data
-  node:
-    build: .
-    environment:
-      - PORT=4000
-      - PGHOST=database
-      - PGDATABASE=postgres
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-    ports:
-      - 80:4000
-    links:
-      - database
-    depends_on:
-      - database
-volumes:
-  database-data:
+version: '3'                                    # We are using the docker compose version 3 specification
+services:                                       # This section defines our services
+  database:                                     # The first service is our database
+    image: postgres:12-alpine                   # Use the Alpine Linux container for Postgres 12
+    restart: always                             # Restart this container if Postgres stops running
+    ports:                                      # Open these ports
+      - 5432:5432                               # 5432 is the default Postgres port
+    environment:                                # Set these environemnt variables in the container
+      POSTGRES_PASSWORD: 'postgres'             # Postgres will set this password for the default user when it starts
+    volumes:                                    # Defines the filesystem volumes for the container
+      - database-data:/var/lib/postgresql/data  # Name the volume where Postgres stores it's data
+  node:                                         # Our Node application
+    build: .                                    # Build the default Dockerfile in the current directory
+    environment:                                # These variables are used by the app to connect to the Postgres service
+      - PORT=4000                               # The port on which the application serves content
+      - PGHOST=database                         # The hostname of the Postgres database container
+      - PGDATABASE=postgres                     # Name of the default Postgres Database
+      - PGUSER=postgres                         # The default Postgres user
+      - PGPASSWORD=postgres                     # The password which we set earlier for the Postgres service
+    ports:                                      # Port mappings
+      - 80:4000                                 # Expose port 4000 on the container and map it to port 80 on the host machine
+    links:                                      # Link these services
+      - database                                # Link our database so that ourapp can make queries
+    depends_on:                                 # Service dependencies
+      - database                                # We need the database running in order to start our container
+    volumes:                                    # Filesystem volumes
+      database-data:                            # Define the volume used by the database container
 ```
-
-And now with comments explaining each line:
-
-```
-version: '3' # We are using the docker compose version 3 specification
-services: # This section defines our services
-  database: # The first service is our database
-    image: postgres:12-alpine # Use the Alpine Linux container for Postgres 12
-    restart: always # Restart this container if Postgres stops running
-    ports: # Open these ports
-      - 5432:5432 # 5432 is the default Postgres port
-    environment: # Set these environemnt variables in the container
-      POSTGRES_PASSWORD: 'postgres' # Postgres will set this password for the default user when it starts
-    volumes: Defines the filesystem volumes for the container
-      - database-data:/var/lib/postgresql/data # Name the volume where Postgres stores it's data
-  node: # Our Node application
-    build: . # Build the default Dockerfile in the current directory
-    environment: # These variables are used by the app to connect to the Postgres service
-      - PORT=4000 # The port on which the application serves content
-      - PGHOST=database # The hostname of the Postgres database container
-      - PGDATABASE=postgres # Name of the default Postgres Database
-      - PGUSER=postgres # The default Postgres user
-      - PGPASSWORD=postgres # The password which we set earlier for the Postgres service
-    ports: # Port mappings
-      - 80:4000 # Expose port 4000 on the container and map it to port 80 on the host machine
-    links: # Link these services
-      - database # Link our database so that ourapp can make queries
-    depends_on: # Service dependencies
-      - database # We need the database running in order to start our container
-volumes: # Filesystem volumes
-  database-data: # Define the volume used by the database container
-
-```
-
