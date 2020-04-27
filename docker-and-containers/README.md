@@ -24,23 +24,23 @@ CMD ["npm", "start"]
 
 Each line of the Dockerfile contains a command that tells Docker to do something during the build process. We'll go through each of these commands below to give you a comprehensive understanding of Docker basics.
 
-### Dockerfile Commands
+### Dockerfile Directives
 
-#### The `FROM` Command
+#### The `FROM` Directive
 
-Most Dockerfiles start with a source container which is a prebuilt container stored on the Docker hub repository or on another repository somewhere else. In order to tell Docker which container you want to start with, you can use the `FROM` command.
+Most Dockerfiles start with a source container which is a prebuilt container stored on the Docker hub repository or on another repository somewhere else. In order to tell Docker which container you want to start with, you can use the `FROM` directive.
 
 In our case we are creating a NodeJS container and we want the version which is built on a lightweight linux operating system called Alpine. So we specify `FROM node:14-alpine`. Note that the number 14 specifies the NodeJS version and could be used by itself to get the default node container with a different operating system.
 
-In general when referring to Docker containers use the `name:version` convention. If you do not specify a version Docker will pull the latest container in the repository. Go ahead and look at the Dockerfile in this repository as I will be referring to it as we continue.
+In general when referring to Docker containers use the `name:version` convention. If you do not specify a version Docker will pull the latest container in the repository.
 
-#### The `RUN` Command
+#### The `RUN` Directive
 
 The `RUN` command in a Dockerfile tells Docker to run a command when building the container. In the case of our Dockfile we use `RUN mkdir /opscentric` to create a folder in the container, in which we will place our application files.
 
 The `RUN` command can be used to execute any command which is available on the container operating systems command line. In our case that's Alpine Linux which has a lmited subset of normal Linux utilities but `mkdir` is still present.
 
-#### The `ADD` Command
+#### The `ADD` Directive
 
 The `ADD` command in a Dockerfile tells Docker to add files to the container. In our case we use `ADD . /opscentric` to place the files in our repository into the container. Not the `.` as it is important, it specifies the local directory in which the Dockerfile resides.
 
@@ -111,8 +111,6 @@ services:                                       # This section defines our servi
       - 5432:5432                               # 5432 is the default Postgres port
     environment:                                # Set these environemnt variables in the container
       POSTGRES_PASSWORD: 'postgres'             # Postgres will set this password for the default user when it starts
-    volumes:                                    # Defines the filesystem volumes for the container
-      - database-data:/var/lib/postgresql/data  # Name the volume where Postgres stores it's data
   node:                                         # Our Node application
     build: .                                    # Build the default Dockerfile in the current directory
     environment:                                # These variables are used by the app to connect to the Postgres service
@@ -124,9 +122,57 @@ services:                                       # This section defines our servi
     ports:                                      # Port mappings
       - 80:4000                                 # Expose port 4000 on the container and map it to port 80 on the host machine
     links:                                      # Link these services
-      - database                                # Link our database so that ourapp can make queries
+      - database                                # Link our database so that our app can make queries
     depends_on:                                 # Service dependencies
       - database                                # We need the database running in order to start our container
-    volumes:                                    # Filesystem volumes
-      database-data:                            # Define the volume used by the database container
 ```
+
+You'll notice that Docker Compose files use the YAML format which is hierarchical based on how many spaces are in front of a line. For nested objects you must add 2 more spaces for each sub-object.
+
+Lower level items under a main concept such as `ports:` or `environment:`can have more than one item defined and get a `-` in front of each line.
+
+### Docker Compose Concepts
+
+Docker Compose files can be broken down into concepts based on what you are trying to accomplish. We'll cover the ones we use in this repo tutorial below.
+
+#### The `services:` Directive
+
+This is the top level directive under which we name and define our services. Services can be named whatever you like but it is advisable to name them something logical based on their purpose for easy reference later.
+
+#### The `image:` Directive
+
+This tells Docker which image to use for a given service. This can be an image in your local image repository or on the Docker Hub. See `build:` below for an alternative to the `image:` directive.
+
+#### The `build:` Directive
+
+Instead of an `image:` you can define a Dockerfile from which Docker Compose should build an image for use. If you specify a period instead of a filename Docker will build the Dockerfile in the current directory.
+
+#### The `restart:` Directive
+
+By default a service will not restart if it exits intentionally or due to an error. Set this to `always` if you want to ensure that a container restarts everytime it stops.
+
+#### The `ports:` Directive
+
+This directive tell Docker which ports to explose on a container and how to map them to ports on the host machine. This is how you can define access to your containers from a local browser for example.
+
+#### The `environment:` Directive
+
+Environment variables set here are pushed ot the container when it starts. This is the preferred way to configure a container. Many common containers such as Postgres are setup to use specific environment variables on start to configure the service.
+
+#### The `links:` Directive
+
+`links:` tells Docker which of our service should be able to ocmmunicate with each other. You can specify services here based on their name such as `- database` in our example file.
+
+#### The `depends_on:` Directive
+
+Similar to `links:` except instead of creating a network link this directive tells Docker which services need to be running before this service can start. In our example we make sure the database is running before starting our app.
+
+### Using Docker Compose
+
+Now that you know how Docker Compose files work you are ready to try it out. Docker Compose uses command line commands simimlar to Docker except instead of `docker` you will use `docker-compose`.
+
+The main way you will do this is with the `up` and `down` commands. Docker Compose has other comands to perform subsets of the `up` and `down` workflows and other tasks but today we will focus on these 2.
+
+### Docker Compose Commands
+
+#### The `up` Command
