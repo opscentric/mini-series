@@ -104,29 +104,29 @@ To use Docker Compose you normally create a file called docker-compose.yml in th
 Our docker-compose.yml file in this example defines 2 services, the Node app in this repo and a Postgres database. Have a look at it below with comments explaining each line:
 
 ```
-version: '3'                                    # We are using the docker compose version 3 specification
-services:                                       # This section defines our services
-  database:                                     # The first service is our database
-    image: postgres:12-alpine                   # Use the Alpine Linux container for Postgres 12
-    restart: always                             # Restart this container if Postgres stops running
-    ports:                                      # Open these ports
-      - 5432:5432                               # 5432 is the default Postgres port
-    environment:                                # Set these environemnt variables in the container
-      POSTGRES_PASSWORD: 'postgres'             # Postgres will set this password for the default user when it starts
-  node:                                         # Our Node application
-    build: .                                    # Build the default Dockerfile in the current directory
-    environment:                                # These variables are used by the app to connect to the Postgres service
-      - PORT=4000                               # The port on which the application serves content
-      - PGHOST=database                         # The hostname of the Postgres database container
-      - PGDATABASE=postgres                     # Name of the default Postgres Database
-      - PGUSER=postgres                         # The default Postgres user
-      - PGPASSWORD=postgres                     # The password which we set earlier for the Postgres service
-    ports:                                      # Port mappings
-      - 80:4000                                 # Expose port 4000 on the container and map it to port 80 on the host machine
-    links:                                      # Link these services
-      - database                                # Link our database so that our app can make queries
-    depends_on:                                 # Service dependencies
-      - database                                # We need the database running in order to start our container
+version: '3'                        # Use the docker compose version 3 specification.
+services:                           # Define our services.
+  database:                         # Define our database service.
+    image: postgres:12-alpine       # Use the Alpine Linux container for Postgres 12.
+    restart: always                 # Restart this container if Postgres stops running.
+    ports:                          # Open the ports needed by Postgres.
+      - 5432:5432                   # 5432 is the default Postgres port.
+    environment:                    # Set these environemnt variables in the container.
+      POSTGRES_PASSWORD: 'postgres' # Postgres will set this password for the default user on start.
+  node:                             # Define our Node app.
+    build: .                        # Build the default Dockerfile in the current directory.
+    environment:                    # Define variables used by the app.
+      - PORT=4000                   # The port on which the application serves content.
+      - PGHOST=database             # The hostname of the Postgres database container.
+      - PGDATABASE=postgres         # Name of the default Postgres Database.
+      - PGUSER=postgres             # The default Postgres user.
+      - PGPASSWORD=postgres         # The password which we set earlier for Postgres.
+    ports:                          # Open the ports needed by the app.
+      - 80:4000                     # Expose port 4000 on the container and map it to port 80 locally.
+    links:                          # Link our services.
+      - database                    # Link our database so that our app can make queries.
+    depends_on:                     # Define dependencies.
+      - database                    # We need the database running before our app.
 ```
 
 You'll notice that Docker Compose files use the YAML format which is hierarchical based on how many spaces are in front of a line. For nested objects you must add 2 more spaces for each sub-object.
