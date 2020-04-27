@@ -22,7 +22,7 @@ EXPOSE 4000
 CMD ["npm", "start"]
 ```
 
-Each line of the Dockerfile contains a command that tells Docker to do something during the build process. We'll go through each of these commands below to give you a comprehensive understanding of Docker basics.
+Each line of the Dockerfile contains a directive that tells Docker to do something during the build process. We'll go through each of these directives below to give you a comprehensive understanding of Docker basics.
 
 ### Dockerfile Directives
 
@@ -32,17 +32,17 @@ Most Dockerfiles start with a source container which is a prebuilt container sto
 
 In our case we are creating a NodeJS container and we want the version which is built on a lightweight linux operating system called Alpine. So we specify `FROM node:14-alpine`. Note that the number 14 specifies the NodeJS version and could be used by itself to get the default node container with a different operating system.
 
-In general when referring to Docker containers use the `name:version` convention. If you do not specify a version Docker will pull the latest container in the repository.
+In general when referring to Docker containers use the `name:version` convention. If you do not specify a version Docker will pull the latest container in the repository. Refer back to the Dockerfile above for examples as we go through the directives.
 
 #### The `RUN` Directive
 
-The `RUN` command in a Dockerfile tells Docker to run a command when building the container. In the case of our Dockfile we use `RUN mkdir /opscentric` to create a folder in the container, in which we will place our application files.
+The `RUN` directive in a Dockerfile tells Docker to run a directive when building the container. In the case of our Dockfile we use `RUN mkdir /opscentric` to create a folder in the container, in which we will place our application files.
 
-The `RUN` command can be used to execute any command which is available on the container operating systems command line. In our case that's Alpine Linux which has a lmited subset of normal Linux utilities but `mkdir` is still present.
+The `RUN` directive can be used to execute any command which is available on the container operating systems command line. In our case that's Alpine Linux which has a lmited subset of normal Linux utilities but `mkdir` is still present.
 
 #### The `ADD` Directive
 
-The `ADD` command in a Dockerfile tells Docker to add files to the container. In our case we use `ADD . /opscentric` to place the files in our repository into the container. Not the `.` as it is important, it specifies the local directory in which the Dockerfile resides.
+The `ADD` directive in a Dockerfile tells Docker to add files to the container. In our case we use `ADD . /opscentric` to place the files in our repository into the container. Not the `.` as it is important, it specifies the local directory in which the Dockerfile resides.
 
 You'll notice we also have a `.dockerignore` file in the repository which contains the following lines: 
 
@@ -55,19 +55,19 @@ README.md
 
 The `.dockerignore` file is a special file which tells Docker to ignore specific files and folders when building a container. It's useful when we have extra files that we don't need for our application to run.
 
-#### The `WORKDIR` Command
+#### The `WORKDIR` Directive
 
-The `WORKDIR` command tells Docker to run subsequent commands in the specified directory. In our case that's `/opscentric`. It's a simple but useful command especially for more complex containers which contain several directories.
+The `WORKDIR` directive tells Docker to run subsequent directives in the specified directory. In our case that's `/opscentric`. It's a simple but useful directive especially for more complex containers which contain several directories.
 
-#### The `EXPOSE` Command
+#### The `EXPOSE` Directive
 
-The `EXPOSE` command tells Docker to open one or more ports in the container. In our case we just want to open port `4000` because that's the port that our Node app will use.
+The `EXPOSE` directive tells Docker to open one or more ports in the container. In our case we just want to open port `4000` because that's the port that our Node app will use.
 
-You can specify more than one port after the `EXPOSE` command just put a space between each one (i.e `EXPOSE 8080 4000 5000`).
+You can specify more than one port after the `EXPOSE` directive just put a space between each one (i.e `EXPOSE 8080 4000 5000`).
 
-#### The `CMD` Command
+#### The `CMD` Directive
 
-The `CMD` command tells Docker how to start the container. It takes a list of command or arguments.
+The `CMD` directive tells Docker how to start the container. It takes a list of commands as arguments.
 
 For our Node app we want to run `npm start` so we use `CMD ["npm", "start"]`. Notice that each command is a string separated by a comma and that they are enclosed in brackets.
 
@@ -167,12 +167,26 @@ Environment variables set here are pushed ot the container when it starts. This 
 
 Similar to `links:` except instead of creating a network link this directive tells Docker which services need to be running before this service can start. In our example we make sure the database is running before starting our app.
 
-### Using Docker Compose
+### Docker Compose Commands
 
 Now that you know how Docker Compose files work you are ready to try it out. Docker Compose uses command line commands simimlar to Docker except instead of `docker` you will use `docker-compose`.
 
 The main way you will do this is with the `up` and `down` commands. Docker Compose has other comands to perform subsets of the `up` and `down` workflows and other tasks but today we will focus on these 2.
 
-### Docker Compose Commands
-
 #### The `up` Command
+
+To run your Docker Compose setup you can use `docker-compose up`. This will build and start your containers, create any networks or links defined and instantiate volumes. If your Dokcerfile has changed since the last build and you wish to rebuild it to get the latest changes add the `--build` flag to the end of the command.
+
+#### The `down` Command
+
+When you are done with your Docker Compose setup and want to turn it off use the `docker-compose down' command. This will stop your containers, unmount volumes and terminate any netwokrs created by the `up` command.
+
+### Using Docker Compose
+
+Let's go ahead and try it now. Make sure you have navigated to the directory where you cloned the project repo on your command line and type `docker-compose up`. You will see some logs in your terminal as the Database container is started and then the Node app container.
+
+You may see a few warning messages, these are ok. If all goes well you will see the current time output to the console and then a message saying `Server running on 4000`.
+
+Once you see this message you can navigate to `localhost` in your browser and you should see the current time output to the page. This time is being queried from the database and means your Docker Compose setup is up and running!
+
+Congratulations you have successfully created a Docker container, run it with Docker Compose and linked it to a database. You can now run `docker-compose down` in your terminal to stop the database and Node app. Alternatively you can type CTRL + C to stop the Docker Compose process.
