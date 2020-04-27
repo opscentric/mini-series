@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   database:
     image: postgres:12-alpine
@@ -10,7 +9,6 @@ services:
       POSTGRES_PASSWORD: 'postgres'
     volumes:
       - database-data:/var/lib/postgresql/data
-  
   node:
     build: .
     environment:
@@ -19,14 +17,11 @@ services:
       - PGDATABASE=postgres
       - PGUSER=postgres
       - PGPASSWORD=postgres
-    expose:
-      - 4000
     ports:
       - 80:4000
     links:
       - database
     depends_on:
       - database
-
 volumes:
   database-data:
