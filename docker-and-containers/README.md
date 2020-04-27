@@ -1,6 +1,8 @@
-# OpsCentric Mini Series: Docker and Containers
+# OpsCentric DevOps Career Accelerator Mini Series: Docker and Containers
 
 This lesson focuses on Docker and containerization. When you have completed this lesson you will know how to create a Docker container, run a Docker container and how to use Docker Compose to link containers together.
+
+This material was developed for the OpsCentric DevOps Career Accelerator Mini Series but can also be used as a standalone Docker tutorial. If you would like to sign up for the rest of the course you can subscribe for free [here](https://miniseries.opscentric.io/devops-career-success). 
 
 You can clone this repository to your computer and follow along with this lesson but you will remember more of this information if you type the Dockerfile and docker-compose.yml files out by hand. You will need Docker and Docker Compose installed on your machine. If you have not yet done so please install them now. 
 
